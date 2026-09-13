@@ -1,0 +1,2254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckList Share</title>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #f4f7fb;
+  --card: #ffffff;
+  --text: #172033;
+  --sub: #687386;
+  --primary: #5b6cff;
+  --primary-dark: #4657e8;
+  --border: #e3e8f0;
+  --danger: #ef5350;
+  --success: #22a06b;
+  --shadow: 0 10px 30px rgba(25, 40, 70, 0.08);
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Noto Sans KR",
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: auto;
+  min-height: 70px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.logo {
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.logo span {
+  color: var(--primary);
+}
+
+.room-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eef1ff;
+  color: var(--primary-dark);
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 25px 20px 60px;
+}
+
+.page-title {
+  margin: 10px 0 5px;
+  font-size: 32px;
+  font-weight: 850;
+}
+
+.page-subtitle {
+  color: var(--sub);
+  margin-bottom: 25px;
+}
+
+/* =========================
+   ROOM SCREEN
+========================= */
+
+.room-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+}
+
+.room-box {
+  width: 100%;
+  max-width: 600px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 38px;
+  box-shadow: var(--shadow);
+}
+
+.room-logo {
+  text-align: center;
+  font-size: 38px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.room-logo span {
+  color: var(--primary);
+}
+
+.room-description {
+  text-align: center;
+  color: var(--sub);
+  margin-bottom: 30px;
+}
+
+.room-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  border: 0;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-weight: 750;
+  transition: 0.15s;
+}
+
+.primary-btn {
+  background: var(--primary);
+  color: white;
+}
+
+.primary-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.secondary-btn {
+  background: #eef1f6;
+  color: var(--text);
+}
+
+.secondary-btn:hover {
+  background: #e3e8f0;
+}
+
+.danger-btn {
+  background: #fff0f0;
+  color: var(--danger);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 14px;
+  outline: none;
+  background: white;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(91,108,255,0.1);
+}
+
+.code-input {
+  text-align: center;
+  letter-spacing: 5px;
+  font-size: 23px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.room-code-display {
+  margin: 20px 0;
+  padding: 22px;
+  border-radius: 18px;
+  background: #f1f3ff;
+  text-align: center;
+}
+
+.room-code-label {
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.room-code {
+  font-size: 36px;
+  letter-spacing: 8px;
+  color: var(--primary);
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+/* =========================
+   NAV
+========================= */
+
+.nav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 25px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.nav button {
+  border: 0;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 10px 17px;
+  border-radius: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nav button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 5px 18px rgba(25,40,70,0.045);
+}
+
+.card h3 {
+  margin-top: 0;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.empty {
+  color: var(--sub);
+  text-align: center;
+  padding: 35px 10px;
+}
+
+/* =========================
+   ITEMS
+========================= */
+
+.item {
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 14px;
+  margin-top: 10px;
+  background: white;
+}
+
+.item.completed {
+  opacity: 0.6;
+}
+
+.item-title {
+  font-weight: 750;
+  word-break: break-word;
+}
+
+.item.completed .item-title {
+  text-decoration: line-through;
+}
+
+.item-meta {
+  color: var(--sub);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.item-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.small-btn {
+  border: 0;
+  border-radius: 9px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #eef1f6;
+}
+
+.small-btn.delete {
+  background: #fff0f0;
+  color: var(--danger);
+}
+
+/* =========================
+   ADD FORMS
+========================= */
+
+.add-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.add-form.two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.add-form button {
+  width: 100%;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 100;
+  max-width: 350px;
+  padding: 13px 17px;
+  border-radius: 12px;
+  background: #172033;
+  color: white;
+  box-shadow: var(--shadow);
+  font-size: 14px;
+}
+
+.status.success {
+  background: var(--success);
+}
+
+.status.error {
+  background: var(--danger);
+}
+
+/* =========================
+   ROOM INFO
+========================= */
+
+.room-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.info-chip {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 9px 13px;
+  font-size: 13px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .board-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .room-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .room-box {
+    padding: 25px 20px;
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+
+  .board-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-form.two {
+    grid-template-columns: 1fr;
+  }
+
+  .header-inner {
+    min-height: 62px;
+  }
+
+  .logo {
+    font-size: 18px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     ROOM ENTRY
+========================= -->
+
+<section id="roomScreen" class="room-screen">
+
+  <div class="room-box">
+
+    <div class="room-logo">
+      CheckList <span>Share</span>
+    </div>
+
+    <div class="room-description">
+      하나의 방에서 체크리스트 · 일정 · 메모를 함께 관리하세요.
+    </div>
+
+    <div id="roomHome">
+
+      <div class="room-actions">
+        <button class="primary-btn" onclick="showCreateRoom()">
+          🏠 방 만들기
+        </button>
+
+        <button class="secondary-btn" onclick="showJoinRoom()">
+          🔑 방 참가
+        </button>
+      </div>
+
+    </div>
+
+    <!-- CREATE -->
+
+    <div id="createRoomBox" class="hidden">
+
+      <h3>새 방 만들기</h3>
+
+      <div class="form-group">
+        <label class="form-label">방 이름</label>
+        <input
+          id="createRoomName"
+          class="input"
+          placeholder="예: 우리 가족 체크리스트"
+          maxlength="40"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">내 이름</label>
+        <input
+          id="createUserName"
+          class="input"
+          placeholder="예: 준서"
+          maxlength="20"
+        >
+      </div>
+
+      <button class="primary-btn" style="width:100%" onclick="createRoom()">
+        방 만들기
+      </button>
+
+      <button
+        class="secondary-btn"
+        style="width:100%; margin-top:8px"
+        onclick="backRoomHome()">
+        뒤로
+      </button>
+
+    </div>
+
+    <!-- JOIN -->
+
+    <div id="joinRoomBox" class="hidden">
+
+      <h3>방 참가하기</h3>
+
+      <div class="form-group">
+        <label class="form-label">내 이름</label>
+        <input
+          id="joinUserName"
+          class="input"
+          placeholder="예: 준서"
+          maxlength="20"
+        >
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">8자리 방 코드</label>
+        <input
+          id="joinRoomCode"
+          class="input code-input"
+          maxlength="8"
+          placeholder="AB12CD34"
+          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
+        >
+      </div>
+
+      <button class="primary-btn" style="width:100%" onclick="joinRoom()">
+        방 참가
+      </button>
+
+      <button
+        class="secondary-btn"
+        style="width:100%; margin-top:8px"
+        onclick="backRoomHome()">
+        뒤로
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
+     MAIN APP
+========================= -->
+
+<section id="appScreen" class="hidden">
+
+<header>
+
+  <div class="header-inner">
+
+    <div class="logo">
+      CheckList <span>Share</span>
+    </div>
+
+    <div class="room-badge">
+      🔑 <span id="headerRoomCode">--------</span>
+    </div>
+
+  </div>
+
+</header>
+
+<main class="container">
+
+  <div class="room-info">
+
+    <div class="info-chip">
+      🏠 <span id="roomNameText">방</span>
+    </div>
+
+    <div class="info-chip">
+      👤 <span id="userNameText">사용자</span>
+    </div>
+
+    <div class="info-chip">
+      ☁️ 클라우드 연결
+    </div>
+
+    <button
+      class="danger-btn"
+      onclick="leaveRoom()">
+      방 나가기
+    </button>
+
+  </div>
+
+  <h1 class="page-title">공유 보드</h1>
+
+  <div class="page-subtitle">
+    같은 방 코드를 입력하면 다른 기기에서도 같은 데이터를 볼 수 있습니다.
+  </div>
+
+  <nav class="nav">
+
+    <button
+      id="navBoard"
+      class="active"
+      onclick="switchPage('board')">
+      ☑️ 체크리스트
+    </button>
+
+    <button
+      id="navSchedule"
+      onclick="switchPage('schedule')">
+      📅 일정
+    </button>
+
+    <button
+      id="navMemo"
+      onclick="switchPage('memo')">
+      📝 메모
+    </button>
+
+  </nav>
+
+
+  <!-- =====================
+       BOARD
+  ====================== -->
+
+  <section id="boardPage">
+
+    <div class="board-grid">
+
+      <!-- ADD TASK -->
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>➕ 할 일 추가</h3>
+        </div>
+
+        <div class="add-form">
+
+          <input
+            id="taskTitle"
+            class="input"
+            placeholder="할 일을 입력하세요"
+            maxlength="100"
+          >
+
+          <input
+            id="taskDue"
+            class="input"
+            type="date"
+          >
+
+          <button
+            class="primary-btn"
+            onclick="addTask()">
+            추가
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- TASK LIST -->
+
+      <div class="card">
+
+        <div class="card-header">
+          <h3>☑️ 체크리스트</h3>
+          <span id="taskCount">0</span>
+        </div>
+
+        <div id="taskList">
+          <div class="empty">아직 할 일이 없습니다.</div>
+        </div>
+
+      </div>
+
+
+      <!-- QUICK INFO -->
+
+      <div class="card">
+
+        <h3>📊 방 현황</h3>
+
+        <div class="item">
+
+          <div class="item-title">
+            전체 할 일
+          </div>
+
+          <div class="item-meta">
+            <span id="totalTask">0</span>개
+          </div>
+
+        </div>
+
+        <div class="item">
+
+          <div class="item-title">
+            완료
+          </div>
+
+          <div class="item-meta">
+            <span id="completedTask">0</span>개
+          </div>
+
+        </div>
+
+        <div class="item">
+
+          <div class="item-title">
+            남은 할 일
+          </div>
+
+          <div class="item-meta">
+            <span id="remainingTask">0</span>개
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================
+       SCHEDULE
+  ====================== -->
+
+  <section id="schedulePage" class="hidden">
+
+    <div class="board-grid">
+
+      <div class="card">
+
+        <h3>📅 일정 추가</h3>
+
+        <div class="add-form">
+
+          <input
+            id="eventTitle"
+            class="input"
+            placeholder="일정 제목"
+            maxlength="100"
+          >
+
+          <input
+            id="eventDate"
+            class="input"
+            type="date"
+          >
+
+          <input
+            id="eventTime"
+            class="input"
+            type="time"
+          >
+
+          <button
+            class="primary-btn"
+            onclick="addEvent()">
+            일정 추가
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📌 일정 목록</h3>
+
+        <div id="eventList">
+          <div class="empty">등록된 일정이 없습니다.</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================
+       MEMO
+  ====================== -->
+
+  <section id="memoPage" class="hidden">
+
+    <div class="board-grid">
+
+      <div class="card">
+
+        <h3>📝 새 메모</h3>
+
+        <div class="add-form">
+
+          <input
+            id="memoTitle"
+            class="input"
+            placeholder="메모 제목"
+            maxlength="100"
+          >
+
+          <textarea
+            id="memoContent"
+            class="textarea"
+            placeholder="내용을 입력하세요"
+            maxlength="2000"
+          ></textarea>
+
+          <button
+            class="primary-btn"
+            onclick="addMemo()">
+            메모 추가
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="card">
+
+        <h3>📋 메모 보드</h3>
+
+        <div id="memoList">
+          <div class="empty">등록된 메모가 없습니다.</div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+</section>
+
+
+<div id="status" class="status hidden"></div>
+
+
+<script>
+
+/* =========================================================
+   1. SUPABASE 설정
+========================================================= */
+
+const SUPABASE_URL =
+  "https://jzvmedsxyzkukyyeseht.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_TterNhTjzZm76Ywgy19bzA_kpD61xOp";
+
+
+/* =========================================================
+   2. SUPABASE 연결
+========================================================= */
+
+let supabaseClient = null;
+
+function initSupabase() {
+
+  if (
+    !SUPABASE_URL ||
+    !SUPABASE_PUBLISHABLE_KEY ||
+    SUPABASE_URL.includes("여기에_네_") ||
+    SUPABASE_PUBLISHABLE_KEY.includes("여기에_네_")
+  ) {
+
+    showStatus(
+      "Supabase URL과 Publishable Key를 먼저 입력하세요.",
+      "error"
+    );
+
+    return false;
+  }
+
+  try {
+
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+    return true;
+
+  } catch (error) {
+
+    console.error(error);
+
+    showStatus(
+      "Supabase 연결 설정을 확인하세요.",
+      "error"
+    );
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   3. 상태
+========================================================= */
+
+let currentRoom = null;
+let currentUser = null;
+
+let tasks = [];
+let events = [];
+let memos = [];
+
+let realtimeChannels = [];
+
+
+/* =========================================================
+   4. 화면
+========================================================= */
+
+function showCreateRoom() {
+
+  document.getElementById("roomHome")
+    .classList.add("hidden");
+
+  document.getElementById("joinRoomBox")
+    .classList.add("hidden");
+
+  document.getElementById("createRoomBox")
+    .classList.remove("hidden");
+}
+
+
+function showJoinRoom() {
+
+  document.getElementById("roomHome")
+    .classList.add("hidden");
+
+  document.getElementById("createRoomBox")
+    .classList.add("hidden");
+
+  document.getElementById("joinRoomBox")
+    .classList.remove("hidden");
+}
+
+
+function backRoomHome() {
+
+  document.getElementById("createRoomBox")
+    .classList.add("hidden");
+
+  document.getElementById("joinRoomBox")
+    .classList.add("hidden");
+
+  document.getElementById("roomHome")
+    .classList.remove("hidden");
+}
+
+
+function switchPage(page) {
+
+  const pages = [
+    "board",
+    "schedule",
+    "memo"
+  ];
+
+  pages.forEach(name => {
+
+    const element =
+      document.getElementById(name + "Page");
+
+    element.classList.toggle(
+      "hidden",
+      name !== page
+    );
+
+  });
+
+
+  document
+    .getElementById("navBoard")
+    .classList.toggle(
+      "active",
+      page === "board"
+    );
+
+  document
+    .getElementById("navSchedule")
+    .classList.toggle(
+      "active",
+      page === "schedule"
+    );
+
+  document
+    .getElementById("navMemo")
+    .classList.toggle(
+      "active",
+      page === "memo"
+    );
+}
+
+
+/* =========================================================
+   5. STATUS
+========================================================= */
+
+function showStatus(message, type = "") {
+
+  const box =
+    document.getElementById("status");
+
+  box.textContent = message;
+
+  box.className =
+    "status " + type;
+
+  box.classList.remove("hidden");
+
+  clearTimeout(window.statusTimer);
+
+  window.statusTimer =
+    setTimeout(() => {
+
+      box.classList.add("hidden");
+
+    }, 3000);
+}
+
+
+/* =========================================================
+   6. ROOM CODE
+========================================================= */
+
+function generateRoomCode() {
+
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+  let result = "";
+
+  for (let i = 0; i < 8; i++) {
+
+    result +=
+      chars.charAt(
+        Math.floor(
+          Math.random() * chars.length
+        )
+      );
+
+  }
+
+  return result;
+}
+
+
+/* =========================================================
+   7. CREATE ROOM
+========================================================= */
+
+async function createRoom() {
+
+  if (!initSupabase()) return;
+
+  const roomName =
+    document
+      .getElementById("createRoomName")
+      .value
+      .trim();
+
+  const userName =
+    document
+      .getElementById("createUserName")
+      .value
+      .trim();
+
+
+  if (!roomName) {
+
+    showStatus(
+      "방 이름을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if (!userName) {
+
+    showStatus(
+      "이름을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  let code = "";
+
+  let created = false;
+
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+
+    code = generateRoomCode();
+
+    const { data: existing } =
+      await supabaseClient
+        .from("rooms")
+        .select("id")
+        .eq("code", code)
+        .maybeSingle();
+
+
+    if (!existing) {
+
+      const { data, error } =
+        await supabaseClient
+          .from("rooms")
+          .insert({
+            code: code,
+            name: roomName
+          })
+          .select()
+          .single();
+
+
+      if (!error) {
+
+        currentRoom = data;
+
+        currentUser = {
+          name: userName
+        };
+
+        created = true;
+
+        break;
+      }
+    }
+  }
+
+
+  if (!created) {
+
+    showStatus(
+      "방 생성에 실패했습니다. 다시 시도하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  saveSession();
+
+  await enterApp();
+
+  showStatus(
+    "방이 만들어졌습니다!",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   8. JOIN ROOM
+========================================================= */
+
+async function joinRoom() {
+
+  if (!initSupabase()) return;
+
+  const userName =
+    document
+      .getElementById("joinUserName")
+      .value
+      .trim();
+
+  const code =
+    document
+      .getElementById("joinRoomCode")
+      .value
+      .trim()
+      .toUpperCase();
+
+
+  if (!userName) {
+
+    showStatus(
+      "이름을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if (!/^[A-Z0-9]{8}$/.test(code)) {
+
+    showStatus(
+      "방 코드는 정확히 8자리여야 합니다.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("rooms")
+      .select("*")
+      .eq("code", code)
+      .maybeSingle();
+
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "방을 찾는 중 오류가 발생했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if (!data) {
+
+    showStatus(
+      "존재하지 않는 방 코드입니다.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  currentRoom = data;
+
+  currentUser = {
+    name: userName
+  };
+
+
+  saveSession();
+
+  await enterApp();
+
+  showStatus(
+    "방에 참가했습니다!",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   9. APP 진입
+========================================================= */
+
+async function enterApp() {
+
+  document
+    .getElementById("roomScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("appScreen")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("headerRoomCode")
+    .textContent =
+      currentRoom.code;
+
+
+  document
+    .getElementById("roomNameText")
+    .textContent =
+      currentRoom.name;
+
+
+  document
+    .getElementById("userNameText")
+    .textContent =
+      currentUser.name;
+
+
+  await loadAllData();
+
+  subscribeRealtime();
+
+  switchPage("board");
+}
+
+
+/* =========================================================
+   10. LOAD ALL
+========================================================= */
+
+async function loadAllData() {
+
+  if (!currentRoom) return;
+
+
+  const [
+    taskResult,
+    eventResult,
+    memoResult
+  ] = await Promise.all([
+
+    supabaseClient
+      .from("tasks")
+      .select("*")
+      .eq("room_id", currentRoom.id)
+      .order("created_at", {
+        ascending: false
+      }),
+
+    supabaseClient
+      .from("events")
+      .select("*")
+      .eq("room_id", currentRoom.id)
+      .order("date", {
+        ascending: true
+      }),
+
+    supabaseClient
+      .from("memos")
+      .select("*")
+      .eq("room_id", currentRoom.id)
+      .order("created_at", {
+        ascending: false
+      })
+
+  ]);
+
+
+  if (taskResult.error)
+    console.error(taskResult.error);
+
+  if (eventResult.error)
+    console.error(eventResult.error);
+
+  if (memoResult.error)
+    console.error(memoResult.error);
+
+
+  tasks =
+    taskResult.data || [];
+
+  events =
+    eventResult.data || [];
+
+  memos =
+    memoResult.data || [];
+
+
+  renderAll();
+}
+
+
+/* =========================================================
+   11. REALTIME
+========================================================= */
+
+function subscribeRealtime() {
+
+  if (!currentRoom) return;
+
+  unsubscribeRealtime();
+
+
+  const channel =
+    supabaseClient
+      .channel(
+        "room-" +
+        currentRoom.id +
+        "-" +
+        Date.now()
+      )
+
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "tasks",
+          filter:
+            "room_id=eq." +
+            currentRoom.id
+        },
+        () => {
+
+          loadAllData();
+
+        }
+      )
+
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "events",
+          filter:
+            "room_id=eq." +
+            currentRoom.id
+        },
+        () => {
+
+          loadAllData();
+
+        }
+      )
+
+
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "memos",
+          filter:
+            "room_id=eq." +
+            currentRoom.id
+        },
+        () => {
+
+          loadAllData();
+
+        }
+      )
+
+
+      .subscribe();
+
+
+  realtimeChannels.push(channel);
+}
+
+
+function unsubscribeRealtime() {
+
+  realtimeChannels.forEach(
+    channel => {
+
+      try {
+
+        supabaseClient
+          .removeChannel(channel);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+  );
+
+  realtimeChannels = [];
+}
+
+
+/* =========================================================
+   12. TASK
+========================================================= */
+
+async function addTask() {
+
+  if (!currentRoom) return;
+
+  const title =
+    document
+      .getElementById("taskTitle")
+      .value
+      .trim();
+
+  const due =
+    document
+      .getElementById("taskDue")
+      .value;
+
+  if (!title) {
+
+    showStatus(
+      "할 일을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("tasks")
+      .insert({
+        room_id: currentRoom.id,
+        title: title,
+        due_date: due || null,
+        completed: false
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "할 일 추가에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  document
+    .getElementById("taskTitle")
+    .value = "";
+
+  document
+    .getElementById("taskDue")
+    .value = "";
+
+  await loadAllData();
+
+  showStatus(
+    "할 일이 추가되었습니다.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   13. TASK TOGGLE
+========================================================= */
+
+async function toggleTask(id, completed) {
+
+  const { error } =
+    await supabaseClient
+      .from("tasks")
+      .update({
+        completed: !completed
+      })
+      .eq("id", id)
+      .eq("room_id", currentRoom.id);
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "체크 상태 변경에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  await loadAllData();
+}
+
+
+/* =========================================================
+   14. TASK DELETE
+========================================================= */
+
+async function deleteTask(id) {
+
+  if (!confirm("이 할 일을 삭제할까요?"))
+    return;
+
+  const { error } =
+    await supabaseClient
+      .from("tasks")
+      .delete()
+      .eq("id", id)
+      .eq("room_id", currentRoom.id);
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "할 일 삭제에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  await loadAllData();
+
+  showStatus(
+    "할 일이 삭제되었습니다.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   15. EVENT
+========================================================= */
+
+async function addEvent() {
+
+  if (!currentRoom) return;
+
+  const title =
+    document
+      .getElementById("eventTitle")
+      .value
+      .trim();
+
+  const date =
+    document
+      .getElementById("eventDate")
+      .value;
+
+  const time =
+    document
+      .getElementById("eventTime")
+      .value;
+
+  if (!title) {
+
+    showStatus(
+      "일정 제목을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+  if (!date) {
+
+    showStatus(
+      "일정 날짜를 선택하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("events")
+      .insert({
+        room_id: currentRoom.id,
+        title: title,
+        date: date,
+        time: time || null
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "일정 추가에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  document
+    .getElementById("eventTitle")
+    .value = "";
+
+  document
+    .getElementById("eventDate")
+    .value = "";
+
+  document
+    .getElementById("eventTime")
+    .value = "";
+
+  await loadAllData();
+
+  showStatus(
+    "일정이 추가되었습니다.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   16. EVENT DELETE
+========================================================= */
+
+async function deleteEvent(id) {
+
+  if (!confirm("이 일정을 삭제할까요?"))
+    return;
+
+  const { error } =
+    await supabaseClient
+      .from("events")
+      .delete()
+      .eq("id", id)
+      .eq("room_id", currentRoom.id);
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "일정 삭제에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  await loadAllData();
+}
+
+
+/* =========================================================
+   17. MEMO
+========================================================= */
+
+async function addMemo() {
+
+  if (!currentRoom) return;
+
+  const title =
+    document
+      .getElementById("memoTitle")
+      .value
+      .trim();
+
+  const content =
+    document
+      .getElementById("memoContent")
+      .value
+      .trim();
+
+  if (!title && !content) {
+
+    showStatus(
+      "메모 내용을 입력하세요.",
+      "error"
+    );
+
+    return;
+  }
+
+  const { error } =
+    await supabaseClient
+      .from("memos")
+      .insert({
+        room_id: currentRoom.id,
+        title: title || "메모",
+        content: content
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "메모 추가에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  document
+    .getElementById("memoTitle")
+    .value = "";
+
+  document
+    .getElementById("memoContent")
+    .value = "";
+
+  await loadAllData();
+
+  showStatus(
+    "메모가 추가되었습니다.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   18. MEMO DELETE
+========================================================= */
+
+async function deleteMemo(id) {
+
+  if (!confirm("이 메모를 삭제할까요?"))
+    return;
+
+  const { error } =
+    await supabaseClient
+      .from("memos")
+      .delete()
+      .eq("id", id)
+      .eq("room_id", currentRoom.id);
+
+  if (error) {
+
+    console.error(error);
+
+    showStatus(
+      "메모 삭제에 실패했습니다.",
+      "error"
+    );
+
+    return;
+  }
+
+  await loadAllData();
+}
+
+
+/* =========================================================
+   19. RENDER
+========================================================= */
+
+function renderAll() {
+
+  renderTasks();
+  renderEvents();
+  renderMemos();
+  renderStats();
+}
+
+
+/* =========================================================
+   20. RENDER TASKS
+========================================================= */
+
+function renderTasks() {
+
+  const list =
+    document.getElementById("taskList");
+
+  const count =
+    document.getElementById("taskCount");
+
+  count.textContent = tasks.length;
+
+  if (!tasks.length) {
+
+    list.innerHTML =
+      '<div class="empty">아직 할 일이 없습니다.</div>';
+
+    return;
+  }
+
+  list.innerHTML =
+    tasks.map(task => {
+
+      const dueText =
+        task.due_date
+          ? "마감: " + task.due_date
+          : "마감일 없음";
+
+      return `
+        <div class="item ${task.completed ? "completed" : ""}">
+
+          <div class="item-title">
+            ${escapeHtml(task.title)}
+          </div>
+
+          <div class="item-meta">
+            ${escapeHtml(dueText)}
+          </div>
+
+          <div class="item-actions">
+
+            <button
+              class="small-btn"
+              onclick="toggleTask(
+                '${task.id}',
+                ${task.completed}
+              )">
+              ${task.completed ? "↩️ 되돌리기" : "✅ 완료"}
+            </button>
+
+            <button
+              class="small-btn delete"
+              onclick="deleteTask('${task.id}')">
+              🗑️ 삭제
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   21. RENDER EVENTS
+========================================================= */
+
+function renderEvents() {
+
+  const list =
+    document.getElementById("eventList");
+
+  if (!events.length) {
+
+    list.innerHTML =
+      '<div class="empty">등록된 일정이 없습니다.</div>';
+
+    return;
+  }
+
+  list.innerHTML =
+    events.map(event => {
+
+      const timeText =
+        event.time
+          ? " · " + event.time
+          : "";
+
+      return `
+        <div class="item">
+
+          <div class="item-title">
+            ${escapeHtml(event.title)}
+          </div>
+
+          <div class="item-meta">
+            ${escapeHtml(event.date + timeText)}
+          </div>
+
+          <div class="item-actions">
+
+            <button
+              class="small-btn delete"
+              onclick="deleteEvent('${event.id}')">
+              🗑️ 삭제
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   22. RENDER MEMOS
+========================================================= */
+
+function renderMemos() {
+
+  const list =
+    document.getElementById("memoList");
+
+  if (!memos.length) {
+
+    list.innerHTML =
+      '<div class="empty">등록된 메모가 없습니다.</div>';
+
+    return;
+  }
+
+  list.innerHTML =
+    memos.map(memo => {
+
+      return `
+        <div class="item">
+
+          <div class="item-title">
+            ${escapeHtml(memo.title)}
+          </div>
+
+          <div class="item-meta">
+            ${escapeHtml(memo.content)}
+          </div>
+
+          <div class="item-actions">
+
+            <button
+              class="small-btn delete"
+              onclick="deleteMemo('${memo.id}')">
+              🗑️ 삭제
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================================================
+   23. STATS
+========================================================= */
+
+function renderStats() {
+
+  const total =
+    tasks.length;
+
+  const completed =
+    tasks.filter(
+      task => task.completed
+    ).length;
+
+  const remaining =
+    total - completed;
+
+  document
+    .getElementById("totalTask")
+    .textContent =
+      total;
+
+  document
+    .getElementById("completedTask")
+    .textContent =
+      completed;
+
+  document
+    .getElementById("remainingTask")
+    .textContent =
+      remaining;
+}
+
+
+/* =========================================================
+   24. SESSION
+========================================================= */
+
+function saveSession() {
+
+  localStorage.setItem(
+    "checklist_share_session",
+    JSON.stringify({
+      room: currentRoom,
+      user: currentUser
+    })
+  );
+}
+
+
+function loadSession() {
+
+  const raw =
+    localStorage.getItem(
+      "checklist_share_session"
+    );
+
+  if (!raw) return false;
+
+  try {
+
+    const session =
+      JSON.parse(raw);
+
+    if (
+      !session.room ||
+      !session.user
+    ) {
+      return false;
+    }
+
+    currentRoom =
+      session.room;
+
+    currentUser =
+      session.user;
+
+    return true;
+
+  } catch (error) {
+
+    console.error(error);
+
+    return false;
+  }
+}
+
+
+/* =========================================================
+   25. LEAVE ROOM
+========================================================= */
+
+function leaveRoom() {
+
+  unsubscribeRealtime();
+
+  currentRoom = null;
+  currentUser = null;
+
+  tasks = [];
+  events = [];
+  memos = [];
+
+  localStorage.removeItem(
+    "checklist_share_session"
+  );
+
+  document
+    .getElementById("appScreen")
+    .classList.add("hidden");
+
+  document
+    .getElementById("roomScreen")
+    .classList.remove("hidden");
+
+  backRoomHome();
+
+  showStatus(
+    "방에서 나왔습니다.",
+    "success"
+  );
+}
+
+
+/* =========================================================
+   26. HTML ESCAPE
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   27. START
+========================================================= */
+
+window.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    if (!initSupabase())
+      return;
+
+    if (loadSession()) {
+
+      try {
+
+        const { data, error } =
+          await supabaseClient
+            .from("rooms")
+            .select("*")
+            .eq("id", currentRoom.id)
+            .maybeSingle();
+
+        if (!error && data) {
+
+          currentRoom = data;
+
+          await enterApp();
+
+          return;
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+      localStorage.removeItem(
+        "checklist_share_session"
+      );
+
+      currentRoom = null;
+      currentUser = null;
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
