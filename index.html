@@ -1,709 +1,470 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CheckList Share</title>
-
-<!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<style>
-* {
-  box-sizing: border-box;
-}
-
-:root {
-  --bg: #f4f7fb;
-  --card: #ffffff;
-  --text: #172033;
-  --sub: #687386;
-  --primary: #5b6cff;
-  --primary-dark: #4657e8;
-  --border: #e3e8f0;
-  --danger: #ef5350;
-  --success: #22a06b;
-  --shadow: 0 10px 30px rgba(25, 40, 70, 0.08);
-}
-
-body {
-  margin: 0;
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    "Noto Sans KR",
-    sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-button,
-input,
-textarea {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* =========================
-   HEADER
-========================= */
-
-header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(255,255,255,0.94);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--border);
-}
-
-.header-inner {
-  max-width: 1200px;
-  margin: auto;
-  min-height: 70px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.logo {
-  font-size: 21px;
-  font-weight: 800;
-}
-
-.logo span {
-  color: var(--primary);
-}
-
-.room-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #eef1ff;
-  color: var(--primary-dark);
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-/* =========================
-   LAYOUT
-========================= */
-
-.container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 25px 20px 60px;
-}
-
-.page-title {
-  margin: 10px 0 5px;
-  font-size: 32px;
-  font-weight: 850;
-}
-
-.page-subtitle {
-  color: var(--sub);
-  margin-bottom: 25px;
-}
-
-/* =========================
-   ROOM SCREEN
-========================= */
-
-.room-screen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 25px;
-}
-
-.room-box {
-  width: 100%;
-  max-width: 600px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 28px;
-  padding: 38px;
-  box-shadow: var(--shadow);
-}
-
-.room-logo {
-  text-align: center;
-  font-size: 38px;
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-
-.room-logo span {
-  color: var(--primary);
-}
-
-.room-description {
-  text-align: center;
-  color: var(--sub);
-  margin-bottom: 30px;
-}
-
-.room-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.primary-btn,
-.secondary-btn,
-.danger-btn {
-  border: 0;
-  border-radius: 14px;
-  padding: 14px 18px;
-  font-weight: 750;
-  transition: 0.15s;
-}
-
-.primary-btn {
-  background: var(--primary);
-  color: white;
-}
-
-.primary-btn:hover {
-  background: var(--primary-dark);
-  transform: translateY(-1px);
-}
-
-.secondary-btn {
-  background: #eef1f6;
-  color: var(--text);
-}
-
-.secondary-btn:hover {
-  background: #e3e8f0;
-}
-
-.danger-btn {
-  background: #fff0f0;
-  color: var(--danger);
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 7px;
-}
-
-.input,
-.textarea {
-  width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 13px 14px;
-  outline: none;
-  background: white;
-}
-
-.input:focus,
-.textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(91,108,255,0.1);
-}
-
-.code-input {
-  text-align: center;
-  letter-spacing: 5px;
-  font-size: 23px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.room-code-display {
-  margin: 20px 0;
-  padding: 22px;
-  border-radius: 18px;
-  background: #f1f3ff;
-  text-align: center;
-}
-
-.room-code-label {
-  color: var(--sub);
-  font-size: 13px;
-}
-
-.room-code {
-  font-size: 36px;
-  letter-spacing: 8px;
-  color: var(--primary);
-  font-weight: 900;
-  margin-top: 5px;
-}
-
-/* =========================
-   NAV
-========================= */
-
-.nav {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 25px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.nav button {
-  border: 0;
-  background: white;
-  border: 1px solid var(--border);
-  padding: 10px 17px;
-  border-radius: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.nav button.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-}
-
-/* =========================
-   GRID
-========================= */
-
-.board-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 5px 18px rgba(25,40,70,0.045);
-}
-
-.card h3 {
-  margin-top: 0;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-}
-
-.empty {
-  color: var(--sub);
-  text-align: center;
-  padding: 35px 10px;
-}
-
-/* =========================
-   ITEMS
-========================= */
-
-.item {
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  padding: 14px;
-  margin-top: 10px;
-  background: white;
-}
-
-.item.completed {
-  opacity: 0.6;
-}
-
-.item-title {
-  font-weight: 750;
-  word-break: break-word;
-}
-
-.item.completed .item-title {
-  text-decoration: line-through;
-}
-
-.item-meta {
-  color: var(--sub);
-  font-size: 13px;
-  margin-top: 5px;
-}
-
-.item-actions {
-  display: flex;
-  gap: 7px;
-  margin-top: 12px;
-}
-
-.small-btn {
-  border: 0;
-  border-radius: 9px;
-  padding: 7px 10px;
-  font-size: 12px;
-  font-weight: 700;
-  background: #eef1f6;
-}
-
-.small-btn.delete {
-  background: #fff0f0;
-  color: var(--danger);
-}
-
-/* =========================
-   ADD FORMS
-========================= */
-
-.add-form {
-  display: grid;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.add-form.two {
-  grid-template-columns: 1fr 1fr;
-}
-
-.add-form button {
-  width: 100%;
-}
-
-textarea {
-  min-height: 90px;
-  resize: vertical;
-}
-
-/* =========================
-   STATUS
-========================= */
-
-.status {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 100;
-  max-width: 350px;
-  padding: 13px 17px;
-  border-radius: 12px;
-  background: #172033;
-  color: white;
-  box-shadow: var(--shadow);
-  font-size: 14px;
-}
-
-.status.success {
-  background: var(--success);
-}
-
-.status.error {
-  background: var(--danger);
-}
-
-/* =========================
-   ROOM INFO
-========================= */
-
-.room-info {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.info-chip {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 9px 13px;
-  font-size: 13px;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 900px) {
-  .board-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 650px) {
-  .room-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .room-box {
-    padding: 25px 20px;
-  }
-
-  .page-title {
-    font-size: 26px;
-  }
-
-  .board-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .add-form.two {
-    grid-template-columns: 1fr;
-  }
-
-  .header-inner {
-    min-height: 62px;
-  }
-
-  .logo {
-    font-size: 18px;
-  }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CheckList Share 2.0</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* LOGIN */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #e8f0ff, #f8fbff);
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      padding: 32px;
+      border-radius: 22px;
+      box-shadow: 0 15px 45px rgba(0,0,0,0.10);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: #4f7cff;
+    }
+
+    .primary {
+      width: 100%;
+      border: 0;
+      padding: 14px;
+      border-radius: 12px;
+      background: #4f7cff;
+      color: white;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .secondary {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      padding: 13px;
+      border-radius: 12px;
+      background: white;
+      margin-top: 10px;
+    }
+
+    .login-message {
+      margin-top: 14px;
+      text-align: center;
+      min-height: 22px;
+      color: #dc2626;
+      font-size: 14px;
+    }
+
+    /* APP */
+    #app {
+      min-height: 100vh;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: auto;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 20px;
+    }
+
+    .user-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .online-dot {
+      width: 10px;
+      height: 10px;
+      background: #22c55e;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .logout {
+      border: 0;
+      background: #f3f4f6;
+      border-radius: 9px;
+      padding: 8px 12px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .room-box {
+      background: white;
+      padding: 18px;
+      border-radius: 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .room-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .room-row .input {
+      flex: 1;
+      min-width: 180px;
+      margin: 0;
+    }
+
+    .small-button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 15px;
+      background: #4f7cff;
+      color: white;
+      font-weight: 700;
+    }
+
+    .room-code {
+      font-size: 25px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      color: #4f7cff;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      border: 0;
+      background: white;
+      padding: 11px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: #4f7cff;
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: white;
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      margin-bottom: 18px;
+    }
+
+    .panel h2 {
+      margin-top: 0;
+    }
+
+    .add-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .add-row .input {
+      flex: 1;
+      min-width: 180px;
+      margin: 0;
+    }
+
+    .list {
+      margin-top: 15px;
+    }
+
+    .item {
+      border: 1px solid #e5e7eb;
+      border-radius: 13px;
+      padding: 13px;
+      margin-bottom: 9px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .item-main {
+      flex: 1;
+    }
+
+    .item-title {
+      font-weight: 700;
+    }
+
+    .completed {
+      text-decoration: line-through;
+      color: #9ca3af;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 5px;
+    }
+
+    .delete-btn {
+      border: 0;
+      background: #fee2e2;
+      color: #b91c1c;
+      border-radius: 8px;
+      padding: 7px 10px;
+    }
+
+    .member {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .status {
+      font-size: 12px;
+      color: #16a34a;
+    }
+
+    .offline {
+      color: #9ca3af;
+    }
+
+    .notification {
+      padding: 11px;
+      border-radius: 10px;
+      background: #f8fafc;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .unread {
+      background: #eef4ff;
+    }
+
+    textarea.input {
+      resize: vertical;
+      min-height: 150px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      border-radius: 14px;
+      background: #f8fafc;
+      margin-bottom: 10px;
+    }
+
+    .stat-number {
+      font-size: 28px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .empty {
+      color: #9ca3af;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- =========================
-     ROOM ENTRY
-========================= -->
+<!-- LOGIN -->
+<div id="loginScreen">
 
-<section id="roomScreen" class="room-screen">
+  <div class="login-card">
 
-  <div class="room-box">
+    <div class="logo">☑️ CheckList Share</div>
+    <div class="subtitle">2.0 · 함께 쓰는 실시간 체크리스트</div>
 
-    <div class="room-logo">
-      CheckList <span>Share</span>
-    </div>
+    <input
+      id="nicknameInput"
+      class="input"
+      type="text"
+      maxlength="30"
+      placeholder="닉네임"
+    >
 
-    <div class="room-description">
-      하나의 방에서 체크리스트 · 일정 · 메모를 함께 관리하세요.
-    </div>
+    <input
+      id="passwordInput"
+      class="input"
+      type="password"
+      placeholder="비밀번호"
+    >
 
-    <div id="roomHome">
+    <button id="loginButton" class="primary">
+      로그인
+    </button>
 
-      <div class="room-actions">
-        <button class="primary-btn" onclick="showCreateRoom()">
-          🏠 방 만들기
+    <button id="signupButton" class="secondary">
+      새 계정 만들기
+    </button>
+
+    <div id="loginMessage" class="login-message"></div>
+
+  </div>
+
+</div>
+
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <header>
+
+    <div class="header-inner">
+
+      <div class="brand">
+        ☑️ CheckList Share
+      </div>
+
+      <div class="user-area">
+
+        <span>
+          <span class="online-dot"></span>
+          <span id="currentNickname">사용자</span>
+        </span>
+
+        <button id="logoutButton" class="logout">
+          로그아웃
         </button>
 
-        <button class="secondary-btn" onclick="showJoinRoom()">
-          🔑 방 참가
-        </button>
       </div>
 
     </div>
 
-    <!-- CREATE -->
-
-    <div id="createRoomBox" class="hidden">
-
-      <h3>새 방 만들기</h3>
-
-      <div class="form-group">
-        <label class="form-label">방 이름</label>
-        <input
-          id="createRoomName"
-          class="input"
-          placeholder="예: 우리 가족 체크리스트"
-          maxlength="40"
-        >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">내 이름</label>
-        <input
-          id="createUserName"
-          class="input"
-          placeholder="예: 준서"
-          maxlength="20"
-        >
-      </div>
-
-      <button class="primary-btn" style="width:100%" onclick="createRoom()">
-        방 만들기
-      </button>
-
-      <button
-        class="secondary-btn"
-        style="width:100%; margin-top:8px"
-        onclick="backRoomHome()">
-        뒤로
-      </button>
-
-    </div>
-
-    <!-- JOIN -->
-
-    <div id="joinRoomBox" class="hidden">
-
-      <h3>방 참가하기</h3>
-
-      <div class="form-group">
-        <label class="form-label">내 이름</label>
-        <input
-          id="joinUserName"
-          class="input"
-          placeholder="예: 준서"
-          maxlength="20"
-        >
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">8자리 방 코드</label>
-        <input
-          id="joinRoomCode"
-          class="input code-input"
-          maxlength="8"
-          placeholder="AB12CD34"
-          oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'')"
-        >
-      </div>
-
-      <button class="primary-btn" style="width:100%" onclick="joinRoom()">
-        방 참가
-      </button>
-
-      <button
-        class="secondary-btn"
-        style="width:100%; margin-top:8px"
-        onclick="backRoomHome()">
-        뒤로
-      </button>
-
-    </div>
-
-  </div>
-
-</section>
+  </header>
 
 
-<!-- =========================
-     MAIN APP
-========================= -->
+  <main>
 
-<section id="appScreen" class="hidden">
+    <!-- ROOM -->
+    <div class="room-box">
 
-<header>
+      <h2>공유 방</h2>
 
-  <div class="header-inner">
+      <div id="noRoomArea">
 
-    <div class="logo">
-      CheckList <span>Share</span>
-    </div>
+        <div class="room-row">
 
-    <div class="room-badge">
-      🔑 <span id="headerRoomCode">--------</span>
-    </div>
+          <input
+            id="roomNameInput"
+            class="input"
+            placeholder="새 방 이름"
+          >
 
-  </div>
+          <button id="createRoomButton" class="small-button">
+            방 만들기
+          </button>
 
-</header>
-
-<main class="container">
-
-  <div class="room-info">
-
-    <div class="info-chip">
-      🏠 <span id="roomNameText">방</span>
-    </div>
-
-    <div class="info-chip">
-      👤 <span id="userNameText">사용자</span>
-    </div>
-
-    <div class="info-chip">
-      ☁️ 클라우드 연결
-    </div>
-
-    <button
-      class="danger-btn"
-      onclick="leaveRoom()">
-      방 나가기
-    </button>
-
-  </div>
-
-  <h1 class="page-title">공유 보드</h1>
-
-  <div class="page-subtitle">
-    같은 방 코드를 입력하면 다른 기기에서도 같은 데이터를 볼 수 있습니다.
-  </div>
-
-  <nav class="nav">
-
-    <button
-      id="navBoard"
-      class="active"
-      onclick="switchPage('board')">
-      ☑️ 체크리스트
-    </button>
-
-    <button
-      id="navSchedule"
-      onclick="switchPage('schedule')">
-      📅 일정
-    </button>
-
-    <button
-      id="navMemo"
-      onclick="switchPage('memo')">
-      📝 메모
-    </button>
-
-  </nav>
-
-
-  <!-- =====================
-       BOARD
-  ====================== -->
-
-  <section id="boardPage">
-
-    <div class="board-grid">
-
-      <!-- ADD TASK -->
-
-      <div class="card">
-
-        <div class="card-header">
-          <h3>➕ 할 일 추가</h3>
         </div>
 
-        <div class="add-form">
+        <br>
+
+        <div class="room-row">
 
           <input
-            id="taskTitle"
+            id="joinCodeInput"
             class="input"
-            placeholder="할 일을 입력하세요"
-            maxlength="100"
+            maxlength="8"
+            placeholder="8자리 방 코드"
           >
 
-          <input
-            id="taskDue"
-            class="input"
-            type="date"
-          >
-
-          <button
-            class="primary-btn"
-            onclick="addTask()">
-            추가
+          <button id="joinRoomButton" class="small-button">
+            방 참여
           </button>
 
         </div>
@@ -711,736 +472,2005 @@ textarea {
       </div>
 
 
-      <!-- TASK LIST -->
+      <div id="roomArea" class="hidden">
 
-      <div class="card">
-
-        <div class="card-header">
-          <h3>☑️ 체크리스트</h3>
-          <span id="taskCount">0</span>
+        <div>
+          현재 방:
+          <strong id="roomName"></strong>
         </div>
 
-        <div id="taskList">
-          <div class="empty">아직 할 일이 없습니다.</div>
-        </div>
+        <div class="room-code" id="roomCode"></div>
 
-      </div>
-
-
-      <!-- QUICK INFO -->
-
-      <div class="card">
-
-        <h3>📊 방 현황</h3>
-
-        <div class="item">
-
-          <div class="item-title">
-            전체 할 일
-          </div>
-
-          <div class="item-meta">
-            <span id="totalTask">0</span>개
-          </div>
-
-        </div>
-
-        <div class="item">
-
-          <div class="item-title">
-            완료
-          </div>
-
-          <div class="item-meta">
-            <span id="completedTask">0</span>개
-          </div>
-
-        </div>
-
-        <div class="item">
-
-          <div class="item-title">
-            남은 할 일
-          </div>
-
-          <div class="item-meta">
-            <span id="remainingTask">0</span>개
-          </div>
-
+        <div class="meta">
+          이 코드를 다른 사람에게 알려주면 같은 방에 참여할 수 있습니다.
         </div>
 
       </div>
 
     </div>
 
-  </section>
 
+    <!-- TABS -->
+    <div id="mainContent" class="hidden">
 
-  <!-- =====================
-       SCHEDULE
-  ====================== -->
+      <div class="tabs">
 
-  <section id="schedulePage" class="hidden">
+        <button class="tab active" data-section="checklistSection">
+          ✅ 체크리스트
+        </button>
 
-    <div class="board-grid">
+        <button class="tab" data-section="scheduleSection">
+          📅 일정
+        </button>
 
-      <div class="card">
+        <button class="tab" data-section="memoSection">
+          📝 메모
+        </button>
 
-        <h3>📅 일정 추가</h3>
-
-        <div class="add-form">
-
-          <input
-            id="eventTitle"
-            class="input"
-            placeholder="일정 제목"
-            maxlength="100"
-          >
-
-          <input
-            id="eventDate"
-            class="input"
-            type="date"
-          >
-
-          <input
-            id="eventTime"
-            class="input"
-            type="time"
-          >
-
-          <button
-            class="primary-btn"
-            onclick="addEvent()">
-            일정 추가
-          </button>
-
-        </div>
+        <button class="tab" data-section="statsSection">
+          📊 통계
+        </button>
 
       </div>
 
-      <div class="card">
 
-        <h3>📌 일정 목록</h3>
+      <!-- CHECKLIST -->
+      <section id="checklistSection" class="section active">
 
-        <div id="eventList">
-          <div class="empty">등록된 일정이 없습니다.</div>
+        <div class="grid">
+
+          <div class="panel">
+
+            <h2>체크리스트</h2>
+
+            <div class="add-row">
+
+              <input
+                id="taskInput"
+                class="input"
+                placeholder="할 일을 입력하세요"
+              >
+
+              <input
+                id="taskDueInput"
+                class="input"
+                type="datetime-local"
+              >
+
+              <button id="addTaskButton" class="small-button">
+                추가
+              </button>
+
+            </div>
+
+            <div id="taskList" class="list"></div>
+
+          </div>
+
+
+          <div>
+
+            <div class="panel">
+
+              <h2>👥 참여자</h2>
+
+              <div id="memberList">
+                <div class="empty">방에 참여하면 표시됩니다.</div>
+              </div>
+
+            </div>
+
+
+            <div class="panel">
+
+              <h2>🔔 실시간 알림</h2>
+
+              <div id="notificationList">
+                <div class="empty">알림이 없습니다.</div>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
 
-      </div>
-
-    </div>
-
-  </section>
+      </section>
 
 
-  <!-- =====================
-       MEMO
-  ====================== -->
+      <!-- SCHEDULE -->
+      <section id="scheduleSection" class="section">
 
-  <section id="memoPage" class="hidden">
+        <div class="panel">
 
-    <div class="board-grid">
+          <h2>📅 일정</h2>
 
-      <div class="card">
+          <div class="add-row">
 
-        <h3>📝 새 메모</h3>
+            <input
+              id="eventTitleInput"
+              class="input"
+              placeholder="일정 이름"
+            >
 
-        <div class="add-form">
+            <input
+              id="eventDateInput"
+              class="input"
+              type="date"
+            >
+
+            <input
+              id="eventTimeInput"
+              class="input"
+              type="time"
+            >
+
+            <button id="addEventButton" class="small-button">
+              일정 추가
+            </button>
+
+          </div>
+
+          <div id="eventList" class="list"></div>
+
+        </div>
+
+
+        <div class="panel">
+
+          <h2>🗂 지난 일정 기록</h2>
+
+          <div id="historyList"></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- MEMO -->
+      <section id="memoSection" class="section">
+
+        <div class="panel">
+
+          <h2>📝 공유 메모</h2>
 
           <input
-            id="memoTitle"
+            id="memoTitleInput"
             class="input"
             placeholder="메모 제목"
-            maxlength="100"
           >
 
           <textarea
-            id="memoContent"
-            class="textarea"
+            id="memoContentInput"
+            class="input"
             placeholder="내용을 입력하세요"
-            maxlength="2000"
           ></textarea>
 
-          <button
-            class="primary-btn"
-            onclick="addMemo()">
-            메모 추가
+          <button id="saveMemoButton" class="small-button">
+            메모 저장
           </button>
 
+          <div id="memoList" class="list"></div>
+
         </div>
 
-      </div>
+      </section>
 
-      <div class="card">
 
-        <h3>📋 메모 보드</h3>
+      <!-- STATS -->
+      <section id="statsSection" class="section">
 
-        <div id="memoList">
-          <div class="empty">등록된 메모가 없습니다.</div>
+        <div class="panel">
+
+          <h2>📊 통계</h2>
+
+          <div class="stat-card">
+
+            전체 숙제
+
+            <div
+              id="totalTaskStat"
+              class="stat-number"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            완료한 숙제
+
+            <div
+              id="completedTaskStat"
+              class="stat-number"
+            >
+              0
+            </div>
+
+          </div>
+
+
+          <div class="stat-card">
+
+            지난 일정
+
+            <div
+              id="historyStat"
+              class="stat-number"
+            >
+              0
+            </div>
+
+          </div>
+
         </div>
 
-      </div>
+      </section>
 
     </div>
 
-  </section>
+  </main>
 
-</main>
-
-</section>
-
-
-<div id="status" class="status hidden"></div>
+</div>
 
 
 <script>
 
-/* =========================================================
-   1. SUPABASE 설정
-========================================================= */
+  /* =========================================================
+     SUPABASE 설정
+     ========================================================= */
 
-const SUPABASE_URL =
-  "https://jzvmedsxyzkukyyeseht.supabase.co";
+  const SUPABASE_URL =
+    "https://jzvmedsxyzkukyyeseht.supabase.co";
 
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_TterNhTjzZm76Ywgy19bzA_kpD61xOp";
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_TterNhTjzZm76Ywgy19bzA_kpD61xOp";
 
 
-/* =========================================================
-   2. SUPABASE 연결
-========================================================= */
-
-let supabaseClient = null;
-
-function initSupabase() {
-
-  if (
-    !SUPABASE_URL ||
-    !SUPABASE_PUBLISHABLE_KEY ||
-    SUPABASE_URL.includes("여기에_네_") ||
-    SUPABASE_PUBLISHABLE_KEY.includes("여기에_네_")
-  ) {
-
-    showStatus(
-      "Supabase URL과 Publishable Key를 먼저 입력하세요.",
-      "error"
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
     );
 
-    return false;
-  }
 
-  try {
+  /* =========================================================
+     전역 변수
+     ========================================================= */
 
-    supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
+  let currentUser = null;
+  let currentProfile = null;
+  let currentRoom = null;
+
+  let presenceChannel = null;
+  let realtimeChannel = null;
+
+  let onlineUsers = new Set();
+
+
+  /* =========================================================
+     DOM
+     ========================================================= */
+
+  const loginScreen =
+    document.getElementById("loginScreen");
+
+  const app =
+    document.getElementById("app");
+
+  const nicknameInput =
+    document.getElementById("nicknameInput");
+
+  const passwordInput =
+    document.getElementById("passwordInput");
+
+  const loginMessage =
+    document.getElementById("loginMessage");
+
+
+  /* =========================================================
+     닉네임 → 내부 이메일
+     ========================================================= */
+
+  async function nicknameEmail(nickname) {
+
+    const data =
+      new TextEncoder().encode(
+        nickname.trim().toLowerCase()
       );
 
-    return true;
+    const hash =
+      await crypto.subtle.digest(
+        "SHA-256",
+        data
+      );
 
-  } catch (error) {
+    const bytes =
+      new Uint8Array(hash);
 
-    console.error(error);
-
-    showStatus(
-      "Supabase 연결 설정을 확인하세요.",
-      "error"
-    );
-
-    return false;
-  }
-}
-
-
-/* =========================================================
-   3. 상태
-========================================================= */
-
-let currentRoom = null;
-let currentUser = null;
-
-let tasks = [];
-let events = [];
-let memos = [];
-
-let realtimeChannels = [];
-
-
-/* =========================================================
-   4. 화면
-========================================================= */
-
-function showCreateRoom() {
-
-  document.getElementById("roomHome")
-    .classList.add("hidden");
-
-  document.getElementById("joinRoomBox")
-    .classList.add("hidden");
-
-  document.getElementById("createRoomBox")
-    .classList.remove("hidden");
-}
-
-
-function showJoinRoom() {
-
-  document.getElementById("roomHome")
-    .classList.add("hidden");
-
-  document.getElementById("createRoomBox")
-    .classList.add("hidden");
-
-  document.getElementById("joinRoomBox")
-    .classList.remove("hidden");
-}
-
-
-function backRoomHome() {
-
-  document.getElementById("createRoomBox")
-    .classList.add("hidden");
-
-  document.getElementById("joinRoomBox")
-    .classList.add("hidden");
-
-  document.getElementById("roomHome")
-    .classList.remove("hidden");
-}
-
-
-function switchPage(page) {
-
-  const pages = [
-    "board",
-    "schedule",
-    "memo"
-  ];
-
-  pages.forEach(name => {
-
-    const element =
-      document.getElementById(name + "Page");
-
-    element.classList.toggle(
-      "hidden",
-      name !== page
-    );
-
-  });
-
-
-  document
-    .getElementById("navBoard")
-    .classList.toggle(
-      "active",
-      page === "board"
-    );
-
-  document
-    .getElementById("navSchedule")
-    .classList.toggle(
-      "active",
-      page === "schedule"
-    );
-
-  document
-    .getElementById("navMemo")
-    .classList.toggle(
-      "active",
-      page === "memo"
-    );
-}
-
-
-/* =========================================================
-   5. STATUS
-========================================================= */
-
-function showStatus(message, type = "") {
-
-  const box =
-    document.getElementById("status");
-
-  box.textContent = message;
-
-  box.className =
-    "status " + type;
-
-  box.classList.remove("hidden");
-
-  clearTimeout(window.statusTimer);
-
-  window.statusTimer =
-    setTimeout(() => {
-
-      box.classList.add("hidden");
-
-    }, 3000);
-}
-
-
-/* =========================================================
-   6. ROOM CODE
-========================================================= */
-
-function generateRoomCode() {
-
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-  let result = "";
-
-  for (let i = 0; i < 8; i++) {
-
-    result +=
-      chars.charAt(
-        Math.floor(
-          Math.random() * chars.length
+    const hex =
+      Array.from(bytes)
+        .map(
+          b => b.toString(16).padStart(2, "0")
         )
+        .join("");
+
+    return hex + "@checklistshare.local";
+  }
+
+
+  /* =========================================================
+     메시지
+     ========================================================= */
+
+  function showLoginMessage(message, error = true) {
+
+    loginMessage.textContent = message;
+
+    loginMessage.style.color =
+      error ? "#dc2626" : "#16a34a";
+  }
+
+
+  /* =========================================================
+     회원가입
+     ========================================================= */
+
+  document
+    .getElementById("signupButton")
+    .addEventListener("click", async () => {
+
+      const nickname =
+        nicknameInput.value.trim();
+
+      const password =
+        passwordInput.value;
+
+      if (!nickname) {
+        showLoginMessage("닉네임을 입력하세요.");
+        return;
+      }
+
+      if (nickname.length < 2) {
+        showLoginMessage(
+          "닉네임은 2글자 이상 입력하세요."
+        );
+        return;
+      }
+
+      if (!password || password.length < 6) {
+        showLoginMessage(
+          "비밀번호는 6자 이상 입력하세요."
+        );
+        return;
+      }
+
+      showLoginMessage(
+        "계정을 만드는 중입니다...",
+        false
       );
 
-  }
+      try {
 
-  return result;
-}
+        const email =
+          await nicknameEmail(nickname);
+
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+
+            email,
+            password,
+
+            options: {
+              data: {
+                nickname
+              }
+            }
+
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        if (data.user) {
+
+          showLoginMessage(
+            "계정 생성 완료! 로그인해 주세요.",
+            false
+          );
+
+          passwordInput.value = "";
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+        showLoginMessage(
+          "회원가입 실패: " +
+          error.message
+        );
+
+      }
+
+    });
 
 
-/* =========================================================
-   7. CREATE ROOM
-========================================================= */
+  /* =========================================================
+     로그인
+     ========================================================= */
 
-async function createRoom() {
-
-  if (!initSupabase()) return;
-
-  const roomName =
-    document
-      .getElementById("createRoomName")
-      .value
-      .trim();
-
-  const userName =
-    document
-      .getElementById("createUserName")
-      .value
-      .trim();
+  document
+    .getElementById("loginButton")
+    .addEventListener("click", login);
 
 
-  if (!roomName) {
+  passwordInput.addEventListener(
+    "keydown",
+    e => {
 
-    showStatus(
-      "방 이름을 입력하세요.",
-      "error"
+      if (e.key === "Enter") {
+        login();
+      }
+
+    }
+  );
+
+
+  async function login() {
+
+    const nickname =
+      nicknameInput.value.trim();
+
+    const password =
+      passwordInput.value;
+
+    if (!nickname || !password) {
+
+      showLoginMessage(
+        "닉네임과 비밀번호를 입력하세요."
+      );
+
+      return;
+    }
+
+    showLoginMessage(
+      "로그인 중...",
+      false
     );
 
-    return;
-  }
+    try {
 
-
-  if (!userName) {
-
-    showStatus(
-      "이름을 입력하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  let code = "";
-
-  let created = false;
-
-
-  for (let attempt = 0; attempt < 10; attempt++) {
-
-    code = generateRoomCode();
-
-    const { data: existing } =
-      await supabaseClient
-        .from("rooms")
-        .select("id")
-        .eq("code", code)
-        .maybeSingle();
-
-
-    if (!existing) {
+      const email =
+        await nicknameEmail(nickname);
 
       const { data, error } =
-        await supabaseClient
-          .from("rooms")
-          .insert({
-            code: code,
-            name: roomName
-          })
-          .select()
-          .single();
+        await supabaseClient.auth
+          .signInWithPassword({
+            email,
+            password
+          });
 
-
-      if (!error) {
-
-        currentRoom = data;
-
-        currentUser = {
-          name: userName
-        };
-
-        created = true;
-
-        break;
+      if (error) {
+        throw error;
       }
+
+      currentUser =
+        data.user;
+
+      await startApp();
+
+    } catch (error) {
+
+      console.error(error);
+
+      showLoginMessage(
+        "로그인 실패: " +
+        error.message
+      );
+
     }
+
   }
 
 
-  if (!created) {
+  /* =========================================================
+     앱 시작
+     ========================================================= */
 
-    showStatus(
-      "방 생성에 실패했습니다. 다시 시도하세요.",
-      "error"
+  async function startApp() {
+
+    loginScreen.classList.add("hidden");
+
+    app.classList.remove("hidden");
+
+    await loadProfile();
+
+    document.getElementById(
+      "currentNickname"
+    ).textContent =
+      currentProfile?.nickname ||
+      "사용자";
+
+    await loadMyRoom();
+
+  }
+
+
+  /* =========================================================
+     프로필
+     ========================================================= */
+
+  async function loadProfile() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    currentProfile = data;
+
+  }
+
+
+  /* =========================================================
+     기존 방 찾기
+     ========================================================= */
+
+  async function loadMyRoom() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("room_members")
+        .select(`
+          room_id,
+          rooms (
+            id,
+            room_code,
+            name,
+            created_by,
+            created_at
+          )
+        `)
+        .eq("user_id", currentUser.id)
+        .limit(1);
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    if (data && data.length > 0) {
+
+      currentRoom =
+        data[0].rooms;
+
+      await showRoom();
+
+    }
+
+  }
+
+
+  /* =========================================================
+     방 만들기
+     ========================================================= */
+
+  document
+    .getElementById("createRoomButton")
+    .addEventListener(
+      "click",
+      createRoom
     );
 
-    return;
+
+  async function createRoom() {
+
+    const roomName =
+      document
+        .getElementById("roomNameInput")
+        .value.trim() ||
+      "CheckList Share Room";
+
+    const roomCode =
+      generateRoomCode();
+
+    const { data: room, error } =
+      await supabaseClient
+        .from("rooms")
+        .insert({
+
+          room_code: roomCode,
+          name: roomName,
+          created_by: currentUser.id
+
+        })
+        .select()
+        .single();
+
+    if (error) {
+
+      alert(
+        "방 생성 실패: " +
+        error.message
+      );
+
+      return;
+    }
+
+    const { error: memberError } =
+      await supabaseClient
+        .from("room_members")
+        .insert({
+
+          room_id: room.id,
+          user_id: currentUser.id
+
+        });
+
+    if (memberError) {
+
+      alert(
+        "방 참여 처리 실패: " +
+        memberError.message
+      );
+
+      return;
+    }
+
+    currentRoom = room;
+
+    await showRoom();
+
   }
 
 
-  saveSession();
+  /* =========================================================
+     방 코드 생성
+     ========================================================= */
 
-  await enterApp();
+  function generateRoomCode() {
 
-  showStatus(
-    "방이 만들어졌습니다!",
-    "success"
-  );
-}
+    const chars =
+      "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    let result = "";
+
+    for (let i = 0; i < 8; i++) {
+
+      result +=
+        chars[
+          Math.floor(
+            Math.random() * chars.length
+          )
+        ];
+
+    }
+
+    return result;
+
+  }
 
 
-/* =========================================================
-   8. JOIN ROOM
-========================================================= */
+  /* =========================================================
+     방 참여
+     ========================================================= */
 
-async function joinRoom() {
+  document
+    .getElementById("joinRoomButton")
+    .addEventListener(
+      "click",
+      joinRoom
+    );
 
-  if (!initSupabase()) return;
 
-  const userName =
+  async function joinRoom() {
+
+    const code =
+      document
+        .getElementById("joinCodeInput")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if (code.length !== 8) {
+
+      alert(
+        "8자리 방 코드를 입력하세요."
+      );
+
+      return;
+    }
+
+    const { data: room, error } =
+      await supabaseClient
+        .from("rooms")
+        .select("*")
+        .eq("room_code", code)
+        .maybeSingle();
+
+    if (error) {
+
+      alert(
+        "방 검색 실패: " +
+        error.message
+      );
+
+      return;
+    }
+
+    if (!room) {
+
+      alert(
+        "존재하지 않는 방입니다."
+      );
+
+      return;
+    }
+
+    const { error: memberError } =
+      await supabaseClient
+        .from("room_members")
+        .upsert(
+          {
+            room_id: room.id,
+            user_id: currentUser.id
+          },
+          {
+            onConflict:
+              "room_id,user_id"
+          }
+        );
+
+    if (memberError) {
+
+      alert(
+        "방 참여 실패: " +
+        memberError.message
+      );
+
+      return;
+    }
+
+    currentRoom = room;
+
+    await showRoom();
+
+  }
+
+
+  /* =========================================================
+     방 화면
+     ========================================================= */
+
+  async function showRoom() {
+
     document
-      .getElementById("joinUserName")
-      .value
-      .trim();
+      .getElementById("noRoomArea")
+      .classList.add("hidden");
 
-  const code =
     document
-      .getElementById("joinRoomCode")
-      .value
-      .trim()
-      .toUpperCase();
+      .getElementById("roomArea")
+      .classList.remove("hidden");
 
+    document
+      .getElementById("mainContent")
+      .classList.remove("hidden");
 
-  if (!userName) {
-
-    showStatus(
-      "이름을 입력하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  if (!/^[A-Z0-9]{8}$/.test(code)) {
-
-    showStatus(
-      "방 코드는 정확히 8자리여야 합니다.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  const { data, error } =
-    await supabaseClient
-      .from("rooms")
-      .select("*")
-      .eq("code", code)
-      .maybeSingle();
-
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "방을 찾는 중 오류가 발생했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  if (!data) {
-
-    showStatus(
-      "존재하지 않는 방 코드입니다.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  currentRoom = data;
-
-  currentUser = {
-    name: userName
-  };
-
-
-  saveSession();
-
-  await enterApp();
-
-  showStatus(
-    "방에 참가했습니다!",
-    "success"
-  );
-}
-
-
-/* =========================================================
-   9. APP 진입
-========================================================= */
-
-async function enterApp() {
-
-  document
-    .getElementById("roomScreen")
-    .classList.add("hidden");
-
-  document
-    .getElementById("appScreen")
-    .classList.remove("hidden");
-
-
-  document
-    .getElementById("headerRoomCode")
-    .textContent =
-      currentRoom.code;
-
-
-  document
-    .getElementById("roomNameText")
-    .textContent =
+    document
+      .getElementById("roomName")
+      .textContent =
       currentRoom.name;
 
+    document
+      .getElementById("roomCode")
+      .textContent =
+      currentRoom.room_code;
+
+    await loadAll();
+
+    startRealtime();
+
+    startPresence();
+
+    startExpiredScheduleTimer();
+
+  }
+
+
+  /* =========================================================
+     전체 데이터
+     ========================================================= */
+
+  async function loadAll() {
+
+    await archiveExpiredEvents();
+
+    await Promise.all([
+      loadTasks(),
+      loadEvents(),
+      loadMemos(),
+      loadMembers(),
+      loadNotifications(),
+      loadHistory()
+    ]);
+
+    updateStats();
+
+  }
+
+
+  /* =========================================================
+     TASK
+     ========================================================= */
 
   document
-    .getElementById("userNameText")
-    .textContent =
-      currentUser.name;
+    .getElementById("addTaskButton")
+    .addEventListener(
+      "click",
+      addTask
+    );
 
 
-  await loadAllData();
+  async function addTask() {
 
-  subscribeRealtime();
+    const title =
+      document
+        .getElementById("taskInput")
+        .value.trim();
 
-  switchPage("board");
-}
+    const dueInput =
+      document
+        .getElementById("taskDueInput")
+        .value;
 
+    if (!title) {
 
-/* =========================================================
-   10. LOAD ALL
-========================================================= */
+      alert(
+        "할 일을 입력하세요."
+      );
 
-async function loadAllData() {
+      return;
+    }
 
-  if (!currentRoom) return;
+    const { error } =
+      await supabaseClient
+        .from("tasks")
+        .insert({
 
+          room_id: currentRoom.id,
+          title,
+          due: dueInput
+            ? new Date(dueInput).toISOString()
+            : null,
+          created_by: currentUser.id
 
-  const [
-    taskResult,
-    eventResult,
-    memoResult
-  ] = await Promise.all([
+        });
 
-    supabaseClient
-      .from("tasks")
-      .select("*")
-      .eq("room_id", currentRoom.id)
-      .order("created_at", {
-        ascending: false
-      }),
+    if (error) {
 
-    supabaseClient
-      .from("events")
-      .select("*")
-      .eq("room_id", currentRoom.id)
-      .order("date", {
-        ascending: true
-      }),
+      alert(
+        "숙제 추가 실패: " +
+        error.message
+      );
 
-    supabaseClient
-      .from("memos")
-      .select("*")
-      .eq("room_id", currentRoom.id)
-      .order("created_at", {
-        ascending: false
-      })
+      return;
+    }
 
-  ]);
+    document
+      .getElementById("taskInput")
+      .value = "";
 
+    document
+      .getElementById("taskDueInput")
+      .value = "";
 
-  if (taskResult.error)
-    console.error(taskResult.error);
-
-  if (eventResult.error)
-    console.error(eventResult.error);
-
-  if (memoResult.error)
-    console.error(memoResult.error);
+  }
 
 
-  tasks =
-    taskResult.data || [];
+  async function loadTasks() {
 
-  events =
-    eventResult.data || [];
+    const { data, error } =
+      await supabaseClient
+        .from("tasks")
+        .select("*")
+        .eq("room_id", currentRoom.id)
+        .order("created_at", {
+          ascending: false
+        });
 
-  memos =
-    memoResult.data || [];
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    const list =
+      document.getElementById(
+        "taskList"
+      );
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">등록된 숙제가 없습니다.</div>';
+
+      return;
+    }
+
+    data.forEach(task => {
+
+      const item =
+        document.createElement("div");
+
+      item.className = "item";
+
+      const main =
+        document.createElement("div");
+
+      main.className = "item-main";
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "item-title";
+
+      if (task.completed) {
+        title.classList.add("completed");
+      }
+
+      title.textContent =
+        task.title;
+
+      title.style.cursor =
+        "pointer";
+
+      title.addEventListener(
+        "click",
+        () => toggleTask(task)
+      );
+
+      const meta =
+        document.createElement("div");
+
+      meta.className =
+        "meta";
+
+      if (task.due) {
+
+        meta.textContent =
+          "마감: " +
+          formatDateTime(task.due);
+
+      } else {
+
+        meta.textContent =
+          "마감일 없음";
+
+      }
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      const deleteButton =
+        document.createElement("button");
+
+      deleteButton.className =
+        "delete-btn";
+
+      deleteButton.textContent =
+        "삭제";
+
+      deleteButton.addEventListener(
+        "click",
+        () => deleteTask(task.id)
+      );
+
+      item.appendChild(main);
+      item.appendChild(deleteButton);
+
+      list.appendChild(item);
+
+    });
+
+  }
 
 
-  renderAll();
-}
+  async function toggleTask(task) {
+
+    const completed =
+      !task.completed;
+
+    const { error } =
+      await supabaseClient
+        .from("tasks")
+        .update({
+
+          completed,
+
+          completed_by:
+            completed
+              ? currentUser.id
+              : null,
+
+          completed_at:
+            completed
+              ? new Date().toISOString()
+              : null,
+
+          updated_at:
+            new Date().toISOString()
+
+        })
+        .eq("id", task.id);
+
+    if (error) {
+
+      alert(
+        "수정 실패: " +
+        error.message
+      );
+
+    }
+
+  }
 
 
-/* =========================================================
-   11. REALTIME
-========================================================= */
+  async function deleteTask(id) {
 
-function subscribeRealtime() {
+    if (!confirm(
+      "이 숙제를 삭제할까요?"
+    )) {
+      return;
+    }
 
-  if (!currentRoom) return;
+    const { error } =
+      await supabaseClient
+        .from("tasks")
+        .delete()
+        .eq("id", id);
 
-  unsubscribeRealtime();
+    if (error) {
+
+      alert(
+        "삭제 실패: " +
+        error.message
+      );
+
+    }
+
+  }
 
 
-  const channel =
-    supabaseClient
-      .channel(
-        "room-" +
-        currentRoom.id +
-        "-" +
-        Date.now()
+  /* =========================================================
+     SCHEDULE
+     ========================================================= */
+
+  document
+    .getElementById("addEventButton")
+    .addEventListener(
+      "click",
+      addEvent
+    );
+
+
+  async function addEvent() {
+
+    const title =
+      document
+        .getElementById(
+          "eventTitleInput"
+        )
+        .value.trim();
+
+    const date =
+      document
+        .getElementById(
+          "eventDateInput"
+        )
+        .value;
+
+    const time =
+      document
+        .getElementById(
+          "eventTimeInput"
+        )
+        .value;
+
+    if (!title || !date) {
+
+      alert(
+        "일정 이름과 날짜를 입력하세요."
+      );
+
+      return;
+    }
+
+    let expiresAt = null;
+
+    if (time) {
+
+      expiresAt =
+        new Date(
+          `${date}T${time}`
+        ).toISOString();
+
+    } else {
+
+      expiresAt =
+        new Date(
+          `${date}T23:59:59`
+        ).toISOString();
+
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("events")
+        .insert({
+
+          room_id: currentRoom.id,
+          title,
+          date,
+          time: time || null,
+          expires_at: expiresAt,
+          created_by: currentUser.id
+
+        });
+
+    if (error) {
+
+      alert(
+        "일정 추가 실패: " +
+        error.message
+      );
+
+      return;
+    }
+
+    document
+      .getElementById(
+        "eventTitleInput"
       )
+      .value = "";
+
+    document
+      .getElementById(
+        "eventDateInput"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "eventTimeInput"
+      )
+      .value = "";
+
+  }
 
 
+  async function loadEvents() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("events")
+        .select("*")
+        .eq("room_id", currentRoom.id)
+        .order("date", {
+          ascending: true
+        })
+        .order("time", {
+          ascending: true
+        });
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    const list =
+      document.getElementById(
+        "eventList"
+      );
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">예정된 일정이 없습니다.</div>';
+
+      return;
+    }
+
+    data.forEach(event => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "item";
+
+      const main =
+        document.createElement("div");
+
+      main.className =
+        "item-main";
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "item-title";
+
+      title.textContent =
+        event.title;
+
+      const meta =
+        document.createElement("div");
+
+      meta.className =
+        "meta";
+
+      meta.textContent =
+        event.date +
+        (event.time
+          ? " · " + event.time
+          : "");
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "delete-btn";
+
+      deleteButton.textContent =
+        "삭제";
+
+      deleteButton.addEventListener(
+        "click",
+        () => deleteEvent(event.id)
+      );
+
+      item.appendChild(main);
+      item.appendChild(deleteButton);
+
+      list.appendChild(item);
+
+    });
+
+  }
+
+
+  async function deleteEvent(id) {
+
+    if (!confirm(
+      "이 일정을 삭제할까요?"
+    )) {
+      return;
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("events")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+      alert(
+        "삭제 실패: " +
+        error.message
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     일정 자동 기록
+     ========================================================= */
+
+  async function archiveExpiredEvents() {
+
+    if (!currentRoom) {
+      return;
+    }
+
+    try {
+
+      const { error } =
+        await supabaseClient.rpc(
+          "archive_expired_events",
+          {
+            target_room:
+              currentRoom.id
+          }
+        );
+
+      if (error) {
+
+        console.error(
+          "일정 자동 기록 오류:",
+          error
+        );
+
+        return;
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  }
+
+
+  function startExpiredScheduleTimer() {
+
+    setInterval(
+      async () => {
+
+        if (!currentRoom) {
+          return;
+        }
+
+        await archiveExpiredEvents();
+
+        await loadEvents();
+        await loadHistory();
+
+        updateStats();
+
+      },
+      30000
+    );
+
+  }
+
+
+  /* =========================================================
+     HISTORY
+     ========================================================= */
+
+  async function loadHistory() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("schedule_history")
+        .select("*")
+        .eq("room_id", currentRoom.id)
+        .order("completed_at", {
+          ascending: false
+        });
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    const list =
+      document.getElementById(
+        "historyList"
+      );
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">지난 일정 기록이 없습니다.</div>';
+
+      return;
+    }
+
+    data.forEach(history => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "item";
+
+      const main =
+        document.createElement("div");
+
+      main.className =
+        "item-main";
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "item-title";
+
+      title.textContent =
+        history.title;
+
+      const meta =
+        document.createElement("div");
+
+      meta.className =
+        "meta";
+
+      meta.textContent =
+        "기록: " +
+        formatDateTime(
+          history.completed_at
+        );
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      item.appendChild(main);
+
+      list.appendChild(item);
+
+    });
+
+  }
+
+
+  /* =========================================================
+     MEMO
+     ========================================================= */
+
+  document
+    .getElementById("saveMemoButton")
+    .addEventListener(
+      "click",
+      saveMemo
+    );
+
+
+  async function saveMemo() {
+
+    const title =
+      document
+        .getElementById(
+          "memoTitleInput"
+        )
+        .value.trim();
+
+    const content =
+      document
+        .getElementById(
+          "memoContentInput"
+        )
+        .value.trim();
+
+    if (!content) {
+
+      alert(
+        "메모 내용을 입력하세요."
+      );
+
+      return;
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("memos")
+        .insert({
+
+          room_id: currentRoom.id,
+          title: title || null,
+          content,
+          created_by: currentUser.id
+
+        });
+
+    if (error) {
+
+      alert(
+        "메모 저장 실패: " +
+        error.message
+      );
+
+      return;
+    }
+
+    document
+      .getElementById(
+        "memoTitleInput"
+      )
+      .value = "";
+
+    document
+      .getElementById(
+        "memoContentInput"
+      )
+      .value = "";
+
+  }
+
+
+  async function loadMemos() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("memos")
+        .select("*")
+        .eq("room_id", currentRoom.id)
+        .order("created_at", {
+          ascending: false
+        });
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    const list =
+      document.getElementById(
+        "memoList"
+      );
+
+    list.innerHTML = "";
+
+    if (!data || data.length === 0) {
+
+      list.innerHTML =
+        '<div class="empty">저장된 메모가 없습니다.</div>';
+
+      return;
+    }
+
+    data.forEach(memo => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "item";
+
+      const main =
+        document.createElement("div");
+
+      main.className =
+        "item-main";
+
+      const title =
+        document.createElement("div");
+
+      title.className =
+        "item-title";
+
+      title.textContent =
+        memo.title ||
+        "제목 없음";
+
+      const content =
+        document.createElement("div");
+
+      content.className =
+        "meta";
+
+      content.style.whiteSpace =
+        "pre-wrap";
+
+      content.textContent =
+        memo.content;
+
+      main.appendChild(title);
+      main.appendChild(content);
+
+      const deleteButton =
+        document.createElement(
+          "button"
+        );
+
+      deleteButton.className =
+        "delete-btn";
+
+      deleteButton.textContent =
+        "삭제";
+
+      deleteButton.addEventListener(
+        "click",
+        () => deleteMemo(memo.id)
+      );
+
+      item.appendChild(main);
+      item.appendChild(deleteButton);
+
+      list.appendChild(item);
+
+    });
+
+  }
+
+
+  async function deleteMemo(id) {
+
+    if (!confirm(
+      "이 메모를 삭제할까요?"
+    )) {
+      return;
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("memos")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+
+      alert(
+        "삭제 실패: " +
+        error.message
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     MEMBERS
+     ========================================================= */
+
+  async function loadMembers() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("room_members")
+        .select(`
+          user_id,
+          joined_at,
+          profiles (
+            nickname
+          )
+        `)
+        .eq(
+          "room_id",
+          currentRoom.id
+        );
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    renderMembers(data || []);
+
+  }
+
+
+  function renderMembers(members) {
+
+    const list =
+      document.getElementById(
+        "memberList"
+      );
+
+    list.innerHTML = "";
+
+    if (!members.length) {
+
+      list.innerHTML =
+        '<div class="empty">참여자가 없습니다.</div>';
+
+      return;
+    }
+
+    members.forEach(member => {
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "member";
+
+      const nickname =
+        member.profiles?.nickname ||
+        "알 수 없음";
+
+      const left =
+        document.createElement("span");
+
+      left.textContent =
+        nickname;
+
+      if (
+        member.user_id ===
+        currentUser.id
+      ) {
+
+        left.textContent +=
+          " (나)";
+
+      }
+
+      const right =
+        document.createElement("span");
+
+      if (
+        onlineUsers.has(
+          member.user_id
+        )
+      ) {
+
+        right.textContent =
+          "● 온라인";
+
+        right.className =
+          "status";
+
+      } else {
+
+        right.textContent =
+          "● 오프라인";
+
+        right.className =
+          "status offline";
+
+      }
+
+      row.appendChild(left);
+      row.appendChild(right);
+
+      list.appendChild(row);
+
+    });
+
+  }
+
+
+  /* =========================================================
+     PRESENCE
+     ========================================================= */
+
+  async function startPresence() {
+
+    if (!currentRoom) {
+      return;
+    }
+
+    if (presenceChannel) {
+
+      await supabaseClient
+        .removeChannel(
+          presenceChannel
+        );
+
+    }
+
+    presenceChannel =
+      supabaseClient.channel(
+        "presence-" +
+        currentRoom.id,
+        {
+          config: {
+            presence: {
+              key: currentUser.id
+            }
+          }
+        }
+      );
+
+    presenceChannel
+      .on(
+        "presence",
+        {
+          event: "sync"
+        },
+        () => {
+
+          const state =
+            presenceChannel.presenceState();
+
+          onlineUsers =
+            new Set();
+
+          Object.values(state)
+            .flat()
+            .forEach(user => {
+
+              if (user.userId) {
+
+                onlineUsers.add(
+                  user.userId
+                );
+
+              }
+
+            });
+
+          loadMembers();
+
+        }
+      )
+      .on(
+        "presence",
+        {
+          event: "join"
+        },
+        () => {
+
+          loadMembers();
+
+        }
+      )
+      .on(
+        "presence",
+        {
+          event: "leave"
+        },
+        () => {
+
+          loadMembers();
+
+        }
+      );
+
+    await presenceChannel.subscribe(
+      async status => {
+
+        if (
+          status ===
+          "SUBSCRIBED"
+        ) {
+
+          await presenceChannel.track({
+
+            userId:
+              currentUser.id,
+
+            nickname:
+              currentProfile?.nickname ||
+              "사용자",
+
+            onlineAt:
+              new Date().toISOString()
+
+          });
+
+        }
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     NOTIFICATIONS
+     ========================================================= */
+
+  async function loadNotifications() {
+
+    const { data, error } =
+      await supabaseClient
+        .from("notifications")
+        .select("*")
+        .eq(
+          "room_id",
+          currentRoom.id
+        )
+        .order("created_at", {
+          ascending: false
+        })
+        .limit(20);
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    renderNotifications(
+      data || []
+    );
+
+  }
+
+
+  function renderNotifications(
+    notifications
+  ) {
+
+    const list =
+      document.getElementById(
+        "notificationList"
+      );
+
+    list.innerHTML = "";
+
+    if (!notifications.length) {
+
+      list.innerHTML =
+        '<div class="empty">알림이 없습니다.</div>';
+
+      return;
+    }
+
+    notifications.forEach(
+      notification => {
+
+        const item =
+          document.createElement("div");
+
+        item.className =
+          "notification";
+
+        if (!notification.read) {
+
+          item.classList.add(
+            "unread"
+          );
+
+        }
+
+        item.textContent =
+          notification.message;
+
+        list.appendChild(item);
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     REALTIME
+     ========================================================= */
+
+  function startRealtime() {
+
+    if (realtimeChannel) {
+
+      supabaseClient
+        .removeChannel(
+          realtimeChannel
+        );
+
+    }
+
+    realtimeChannel =
+      supabaseClient.channel(
+        "room-" +
+        currentRoom.id
+      );
+
+
+    realtimeChannel
       .on(
         "postgres_changes",
         {
@@ -1451,14 +2481,13 @@ function subscribeRealtime() {
             "room_id=eq." +
             currentRoom.id
         },
-        () => {
+        async () => {
 
-          loadAllData();
+          await loadTasks();
+          updateStats();
 
         }
       )
-
-
       .on(
         "postgres_changes",
         {
@@ -1469,14 +2498,12 @@ function subscribeRealtime() {
             "room_id=eq." +
             currentRoom.id
         },
-        () => {
+        async () => {
 
-          loadAllData();
+          await loadEvents();
 
         }
       )
-
-
       .on(
         "postgres_changes",
         {
@@ -1487,768 +2514,290 @@ function subscribeRealtime() {
             "room_id=eq." +
             currentRoom.id
         },
-        () => {
+        async () => {
 
-          loadAllData();
+          await loadMemos();
 
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "room_members",
+          filter:
+            "room_id=eq." +
+            currentRoom.id
+        },
+        async () => {
 
+          await loadMembers();
 
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter:
+            "room_id=eq." +
+            currentRoom.id
+        },
+        async () => {
+
+          await loadNotifications();
+
+        }
+      )
       .subscribe();
 
-
-  realtimeChannels.push(channel);
-}
+  }
 
 
-function unsubscribeRealtime() {
+  /* =========================================================
+     통계
+     ========================================================= */
 
-  realtimeChannels.forEach(
-    channel => {
+  async function updateStats() {
 
-      try {
-
-        supabaseClient
-          .removeChannel(channel);
-
-      } catch (error) {
-
-        console.error(error);
-
-      }
-
+    if (!currentRoom) {
+      return;
     }
-  );
 
-  realtimeChannels = [];
-}
+    const { data: tasks } =
+      await supabaseClient
+        .from("tasks")
+        .select(
+          "id, completed"
+        )
+        .eq(
+          "room_id",
+          currentRoom.id
+        );
 
+    const { data: history } =
+      await supabaseClient
+        .from("schedule_history")
+        .select("id")
+        .eq(
+          "room_id",
+          currentRoom.id
+        );
 
-/* =========================================================
-   12. TASK
-========================================================= */
+    const total =
+      tasks?.length || 0;
 
-async function addTask() {
+    const completed =
+      tasks?.filter(
+        task => task.completed
+      ).length || 0;
 
-  if (!currentRoom) return;
+    const historyCount =
+      history?.length || 0;
 
-  const title =
     document
-      .getElementById("taskTitle")
-      .value
-      .trim();
-
-  const due =
-    document
-      .getElementById("taskDue")
-      .value;
-
-  if (!title) {
-
-    showStatus(
-      "할 일을 입력하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-  const { error } =
-    await supabaseClient
-      .from("tasks")
-      .insert({
-        room_id: currentRoom.id,
-        title: title,
-        due_date: due || null,
-        completed: false
-      });
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "할 일 추가에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  document
-    .getElementById("taskTitle")
-    .value = "";
-
-  document
-    .getElementById("taskDue")
-    .value = "";
-
-  await loadAllData();
-
-  showStatus(
-    "할 일이 추가되었습니다.",
-    "success"
-  );
-}
-
-
-/* =========================================================
-   13. TASK TOGGLE
-========================================================= */
-
-async function toggleTask(id, completed) {
-
-  const { error } =
-    await supabaseClient
-      .from("tasks")
-      .update({
-        completed: !completed
-      })
-      .eq("id", id)
-      .eq("room_id", currentRoom.id);
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "체크 상태 변경에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  await loadAllData();
-}
-
-
-/* =========================================================
-   14. TASK DELETE
-========================================================= */
-
-async function deleteTask(id) {
-
-  if (!confirm("이 할 일을 삭제할까요?"))
-    return;
-
-  const { error } =
-    await supabaseClient
-      .from("tasks")
-      .delete()
-      .eq("id", id)
-      .eq("room_id", currentRoom.id);
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "할 일 삭제에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  await loadAllData();
-
-  showStatus(
-    "할 일이 삭제되었습니다.",
-    "success"
-  );
-}
-
-
-/* =========================================================
-   15. EVENT
-========================================================= */
-
-async function addEvent() {
-
-  if (!currentRoom) return;
-
-  const title =
-    document
-      .getElementById("eventTitle")
-      .value
-      .trim();
-
-  const date =
-    document
-      .getElementById("eventDate")
-      .value;
-
-  const time =
-    document
-      .getElementById("eventTime")
-      .value;
-
-  if (!title) {
-
-    showStatus(
-      "일정 제목을 입력하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-  if (!date) {
-
-    showStatus(
-      "일정 날짜를 선택하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-  const { error } =
-    await supabaseClient
-      .from("events")
-      .insert({
-        room_id: currentRoom.id,
-        title: title,
-        date: date,
-        time: time || null
-      });
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "일정 추가에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  document
-    .getElementById("eventTitle")
-    .value = "";
-
-  document
-    .getElementById("eventDate")
-    .value = "";
-
-  document
-    .getElementById("eventTime")
-    .value = "";
-
-  await loadAllData();
-
-  showStatus(
-    "일정이 추가되었습니다.",
-    "success"
-  );
-}
-
-
-/* =========================================================
-   16. EVENT DELETE
-========================================================= */
-
-async function deleteEvent(id) {
-
-  if (!confirm("이 일정을 삭제할까요?"))
-    return;
-
-  const { error } =
-    await supabaseClient
-      .from("events")
-      .delete()
-      .eq("id", id)
-      .eq("room_id", currentRoom.id);
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "일정 삭제에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  await loadAllData();
-}
-
-
-/* =========================================================
-   17. MEMO
-========================================================= */
-
-async function addMemo() {
-
-  if (!currentRoom) return;
-
-  const title =
-    document
-      .getElementById("memoTitle")
-      .value
-      .trim();
-
-  const content =
-    document
-      .getElementById("memoContent")
-      .value
-      .trim();
-
-  if (!title && !content) {
-
-    showStatus(
-      "메모 내용을 입력하세요.",
-      "error"
-    );
-
-    return;
-  }
-
-  const { error } =
-    await supabaseClient
-      .from("memos")
-      .insert({
-        room_id: currentRoom.id,
-        title: title || "메모",
-        content: content
-      });
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "메모 추가에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  document
-    .getElementById("memoTitle")
-    .value = "";
-
-  document
-    .getElementById("memoContent")
-    .value = "";
-
-  await loadAllData();
-
-  showStatus(
-    "메모가 추가되었습니다.",
-    "success"
-  );
-}
-
-
-/* =========================================================
-   18. MEMO DELETE
-========================================================= */
-
-async function deleteMemo(id) {
-
-  if (!confirm("이 메모를 삭제할까요?"))
-    return;
-
-  const { error } =
-    await supabaseClient
-      .from("memos")
-      .delete()
-      .eq("id", id)
-      .eq("room_id", currentRoom.id);
-
-  if (error) {
-
-    console.error(error);
-
-    showStatus(
-      "메모 삭제에 실패했습니다.",
-      "error"
-    );
-
-    return;
-  }
-
-  await loadAllData();
-}
-
-
-/* =========================================================
-   19. RENDER
-========================================================= */
-
-function renderAll() {
-
-  renderTasks();
-  renderEvents();
-  renderMemos();
-  renderStats();
-}
-
-
-/* =========================================================
-   20. RENDER TASKS
-========================================================= */
-
-function renderTasks() {
-
-  const list =
-    document.getElementById("taskList");
-
-  const count =
-    document.getElementById("taskCount");
-
-  count.textContent = tasks.length;
-
-  if (!tasks.length) {
-
-    list.innerHTML =
-      '<div class="empty">아직 할 일이 없습니다.</div>';
-
-    return;
-  }
-
-  list.innerHTML =
-    tasks.map(task => {
-
-      const dueText =
-        task.due_date
-          ? "마감: " + task.due_date
-          : "마감일 없음";
-
-      return `
-        <div class="item ${task.completed ? "completed" : ""}">
-
-          <div class="item-title">
-            ${escapeHtml(task.title)}
-          </div>
-
-          <div class="item-meta">
-            ${escapeHtml(dueText)}
-          </div>
-
-          <div class="item-actions">
-
-            <button
-              class="small-btn"
-              onclick="toggleTask(
-                '${task.id}',
-                ${task.completed}
-              )">
-              ${task.completed ? "↩️ 되돌리기" : "✅ 완료"}
-            </button>
-
-            <button
-              class="small-btn delete"
-              onclick="deleteTask('${task.id}')">
-              🗑️ 삭제
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    }).join("");
-}
-
-
-/* =========================================================
-   21. RENDER EVENTS
-========================================================= */
-
-function renderEvents() {
-
-  const list =
-    document.getElementById("eventList");
-
-  if (!events.length) {
-
-    list.innerHTML =
-      '<div class="empty">등록된 일정이 없습니다.</div>';
-
-    return;
-  }
-
-  list.innerHTML =
-    events.map(event => {
-
-      const timeText =
-        event.time
-          ? " · " + event.time
-          : "";
-
-      return `
-        <div class="item">
-
-          <div class="item-title">
-            ${escapeHtml(event.title)}
-          </div>
-
-          <div class="item-meta">
-            ${escapeHtml(event.date + timeText)}
-          </div>
-
-          <div class="item-actions">
-
-            <button
-              class="small-btn delete"
-              onclick="deleteEvent('${event.id}')">
-              🗑️ 삭제
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    }).join("");
-}
-
-
-/* =========================================================
-   22. RENDER MEMOS
-========================================================= */
-
-function renderMemos() {
-
-  const list =
-    document.getElementById("memoList");
-
-  if (!memos.length) {
-
-    list.innerHTML =
-      '<div class="empty">등록된 메모가 없습니다.</div>';
-
-    return;
-  }
-
-  list.innerHTML =
-    memos.map(memo => {
-
-      return `
-        <div class="item">
-
-          <div class="item-title">
-            ${escapeHtml(memo.title)}
-          </div>
-
-          <div class="item-meta">
-            ${escapeHtml(memo.content)}
-          </div>
-
-          <div class="item-actions">
-
-            <button
-              class="small-btn delete"
-              onclick="deleteMemo('${memo.id}')">
-              🗑️ 삭제
-            </button>
-
-          </div>
-
-        </div>
-      `;
-
-    }).join("");
-}
-
-
-/* =========================================================
-   23. STATS
-========================================================= */
-
-function renderStats() {
-
-  const total =
-    tasks.length;
-
-  const completed =
-    tasks.filter(
-      task => task.completed
-    ).length;
-
-  const remaining =
-    total - completed;
-
-  document
-    .getElementById("totalTask")
-    .textContent =
+      .getElementById(
+        "totalTaskStat"
+      )
+      .textContent =
       total;
 
-  document
-    .getElementById("completedTask")
-    .textContent =
+    document
+      .getElementById(
+        "completedTaskStat"
+      )
+      .textContent =
       completed;
 
-  document
-    .getElementById("remainingTask")
-    .textContent =
-      remaining;
-}
+    document
+      .getElementById(
+        "historyStat"
+      )
+      .textContent =
+      historyCount;
 
-
-/* =========================================================
-   24. SESSION
-========================================================= */
-
-function saveSession() {
-
-  localStorage.setItem(
-    "checklist_share_session",
-    JSON.stringify({
-      room: currentRoom,
-      user: currentUser
-    })
-  );
-}
-
-
-function loadSession() {
-
-  const raw =
-    localStorage.getItem(
-      "checklist_share_session"
-    );
-
-  if (!raw) return false;
-
-  try {
-
-    const session =
-      JSON.parse(raw);
-
-    if (
-      !session.room ||
-      !session.user
-    ) {
-      return false;
-    }
-
-    currentRoom =
-      session.room;
-
-    currentUser =
-      session.user;
-
-    return true;
-
-  } catch (error) {
-
-    console.error(error);
-
-    return false;
   }
-}
 
 
-/* =========================================================
-   25. LEAVE ROOM
-========================================================= */
-
-function leaveRoom() {
-
-  unsubscribeRealtime();
-
-  currentRoom = null;
-  currentUser = null;
-
-  tasks = [];
-  events = [];
-  memos = [];
-
-  localStorage.removeItem(
-    "checklist_share_session"
-  );
+  /* =========================================================
+     TAB
+     ========================================================= */
 
   document
-    .getElementById("appScreen")
-    .classList.add("hidden");
+    .querySelectorAll(".tab")
+    .forEach(button => {
 
-  document
-    .getElementById("roomScreen")
-    .classList.remove("hidden");
+      button.addEventListener(
+        "click",
+        () => {
 
-  backRoomHome();
+          document
+            .querySelectorAll(".tab")
+            .forEach(
+              b =>
+                b.classList.remove(
+                  "active"
+                )
+            );
 
-  showStatus(
-    "방에서 나왔습니다.",
-    "success"
-  );
-}
+          button.classList.add(
+            "active"
+          );
 
+          document
+            .querySelectorAll(
+              ".section"
+            )
+            .forEach(section => {
 
-/* =========================================================
-   26. HTML ESCAPE
-========================================================= */
+              section.classList.remove(
+                "active"
+              );
 
-function escapeHtml(value) {
+            });
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+          document
+            .getElementById(
+              button.dataset.section
+            )
+            .classList.add(
+              "active"
+            );
 
-
-/* =========================================================
-   27. START
-========================================================= */
-
-window.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    if (!initSupabase())
-      return;
-
-    if (loadSession()) {
-
-      try {
-
-        const { data, error } =
-          await supabaseClient
-            .from("rooms")
-            .select("*")
-            .eq("id", currentRoom.id)
-            .maybeSingle();
-
-        if (!error && data) {
-
-          currentRoom = data;
-
-          await enterApp();
-
-          return;
         }
-
-      } catch (error) {
-
-        console.error(error);
-
-      }
-
-      localStorage.removeItem(
-        "checklist_share_session"
       );
 
-      currentRoom = null;
-      currentUser = null;
+    });
+
+
+  /* =========================================================
+     로그아웃
+     ========================================================= */
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener(
+      "click",
+      async () => {
+
+        if (presenceChannel) {
+
+          await supabaseClient
+            .removeChannel(
+              presenceChannel
+            );
+
+        }
+
+        if (realtimeChannel) {
+
+          await supabaseClient
+            .removeChannel(
+              realtimeChannel
+            );
+
+        }
+
+        await supabaseClient
+          .auth
+          .signOut();
+
+        location.reload();
+
+      }
+    );
+
+
+  /* =========================================================
+     날짜 표시
+     ========================================================= */
+
+  function formatDateTime(value) {
+
+    if (!value) {
+      return "";
+    }
+
+    const date =
+      new Date(value);
+
+    return date.toLocaleString(
+      "ko-KR",
+      {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     로그인 세션 확인
+     ========================================================= */
+
+  async function checkSession() {
+
+    const {
+      data: {
+        session
+      }
+    } =
+      await supabaseClient
+        .auth
+        .getSession();
+
+    if (
+      session &&
+      session.user
+    ) {
+
+      currentUser =
+        session.user;
+
+      await startApp();
+
     }
 
   }
-);
+
+
+  supabaseClient
+    .auth
+    .onAuthStateChange(
+      async (event, session) => {
+
+        if (
+          session &&
+          session.user &&
+          !currentUser
+        ) {
+
+          currentUser =
+            session.user;
+
+          await startApp();
+
+        }
+
+      }
+    );
+
+
+  /* =========================================================
+     시작
+     ========================================================= */
+
+  checkSession();
 
 </script>
 
 </body>
 </html>
+```
